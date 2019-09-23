@@ -7,16 +7,21 @@ Author: Scott Rodkey - rodkeyscott@gmail.com
 Step-by-step tutorial: https://medium.com/@rodkey/deploying-a-flask-application-on-aws-a72daba6bb80
 '''
 
+import os
 from flask import Flask, render_template, request
-from application import db
+from flask_sqlalchemy import SQLAlchemy
+#from application import db, application
 from application.models import Data
 from application.forms import EnterDBInfo, RetrieveDBInfo
 
 # Elastic Beanstalk initalization
 application = Flask(__name__)
-application.debug=True
+application.debug = True
+application.config.from_object('config')
+
 # change this to your own value
 application.secret_key = 'cC1YCIWOj9GgWspgNEo2'   
+db = SQLAlchemy(application)
 
 @application.route('/', methods=['GET', 'POST'])
 @application.route('/index', methods=['GET', 'POST'])
@@ -26,9 +31,12 @@ def index():
     
     if request.method == 'POST' and form1.validate():
         data_entered = Data(notes=form1.dbNotes.data)
-        try:     
+        print(1)
+        try:
             db.session.add(data_entered)
-            db.session.commit()        
+            print(2)
+            db.session.commit()
+            print(3)
             db.session.close()
         except:
             db.session.rollback()
@@ -43,9 +51,10 @@ def index():
             db.session.close()
         except:
             db.session.rollback()
-        return render_template('results.html', results=query_db, num_return=num_return)                
+        return render_template('results.html', results=query_db, num_return=num_return)
     
     return render_template('index.html', form1=form1, form2=form2)
 
 if __name__ == '__main__':
-    application.run(host='0.0.0.0')
+    print(application.config)
+    application.run(host='127.0.0.1')
