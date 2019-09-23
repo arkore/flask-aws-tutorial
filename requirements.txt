@@ -9,5 +9,5 @@ WTForms
 Werkzeug
 argparse
 itsdangerous
-psycopg2=2.7.6.1
+psycopg2==2.7.6.1
 boto==2.28.0
